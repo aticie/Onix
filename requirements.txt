@@ -1,0 +1,4 @@
+
+numpy
+tensorflow-gpu==1.12
+# conda install -c hcc pycococtools
