@@ -1,13 +1,15 @@
 import numpy as np
 import json
 import os
+import time
 
 from keyPointClass import keyPointClass
 
 import panutils
 
+
 def readPanopticJson(panopPath, seq_name, panel, node):
-    hd_skel_json_path = panopPath+'/hdPose3d_stage1_coco19/'
+    hd_skel_json_path = panopPath + '/hdPose3d_stage1_coco19/'
 
     keyPoints = []
 
@@ -24,11 +26,11 @@ def readPanopticJson(panopPath, seq_name, panel, node):
 
     for skel_json_fname in os.listdir(hd_skel_json_path):
         frameNo = int(skel_json_fname[12:20])
-        with open(hd_skel_json_path+skel_json_fname) as dfile:
+        with open(hd_skel_json_path + skel_json_fname) as dfile:
             bframe = json.load(dfile)
 
         cam = cameras[(panel, node)]
-        
+
         for pNo, body in enumerate(bframe['bodies']):
             # There are 19 3D joints, stored as an array [x1,y1,z1,c1,x2,y2,z2,c2,...]
             # where c1 ... c19 are per-joint detection confidences
@@ -40,21 +42,20 @@ def readPanopticJson(panopPath, seq_name, panel, node):
                                         cam['distCoef'])
 
             # Show only points detected with confidence
-            valid = skel[3, :] > 0.1
+            #valid = skel[3, :] > 0.1
 
-            pt = pt[:,valid]
+            #pt = pt[:, valid]
 
-            #print(pt)
-            
+            # print(pt)
+
             kp = keyPointClass(pNo, pt, panel, node, frameNo)
 
-        keyPoints.append(kp)
+            keyPoints.append(kp)
 
     return keyPoints
-        
-
 
 if __name__=='__main__':
-    filepath = 'E:\Dersler\Master\Computer Vision\Term Project\CompareOpenPoseCmu\\sample'
-    sequence = 'sample'
-    readPanopticJson(filepath, sequence, 0, 0)
+    panopPath = 'E:\Dersler\Master\Computer Vision\Term Project\CompareOpenPoseCmu\\171026_pose2'
+    seq_name = '171026_pose2'
+    panel = 0
+    node = 0

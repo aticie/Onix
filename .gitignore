@@ -1,4 +1,13 @@
 *.pyc
 datasets/*.pyc
 .idea/
+Compare_OpenPose_CmuPanoptic/.idea/
+Compare_OpenPose_CmuPanoptic/*.npy
+Compare_OpenPose_CmuPanoptic/Errors/
+Compare_OpenPose_CmuPanoptic/Errors171026_pose2/
+Compare_OpenPose_CmuPanoptic/Errors171026_pose3/
+Compare_OpenPose_CmuPanoptic/Errors171204_pose3/
+Compare_OpenPose_CmuPanoptic/Errorssample/
+Compare_OpenPose_CmuPanoptic/sample/
+Compare_OpenPose_CmuPanoptic/__pycache__/
 

@@ -3,9 +3,9 @@ import os
 
 cwd = os.getcwd()
 
-def calcTotal():
+def calcTotal(seq):
 
-    errorFP = os.path.join(cwd,"Errors")
+    errorFP = os.path.join(cwd,"Errors"+seq)
 
     for camNo in range(31):
 
@@ -14,7 +14,25 @@ def calcTotal():
         if os.path.exists(savefile):
             continue
         err = np.zeros(15)
+        countList = np.zeros(15)
+        if not os.path.exists(nextFP):
+            continue
+        for file in os.listdir(nextFP):
+            if 'total.npy' in file:
+                continue
+            errorFile = os.path.join(nextFP, file)
+            currentErr = np.load(errorFile)
+            countList = np.where(currentErr == 0, countList, countList+1)
+            err = err + currentErr
 
+        print(countList)
+        print(err)
+        meanErr = np.divide(err, countList)
+        meanErr = np.nan_to_num(meanErr)
+        print(meanErr)
+        np.save(savefile, meanErr)
+        print(camNo," completed")
+        '''
         for frame in range(101):
 
             frameNo = "%08d" % frame
@@ -24,19 +42,17 @@ def calcTotal():
 
 
         np.save(savefile,err)
-
+        '''
     return 0
 
 
-def printErr(camNo):
+def printErr(camNo, seq):
 
-    errorFP = os.path.join(cwd,"Errors")
+    errorFP = os.path.join(cwd,"Errors"+seq)
     nextFP = os.path.join(errorFP, "%02d" % camNo)
     loadfile = os.path.join(nextFP,"total.npy")
 
     error = np.load(loadfile)
-
-    error = np.divide(error,101)
 
     maxValue = np.amax(error)
     maxInd = np.where(error == np.amax(error))
@@ -45,29 +61,31 @@ def printErr(camNo):
     #print(str(camNo) + ","+str(maxValue)+","+str(maxInd[0]))
     sumErr = np.sum(error)
 
-    print(str(camNo)+ "," + str(sumErr))
+    print(str(camNo)+ "," +str(maxValue) + "," + str(maxInd[0]) + "," + str(sumErr))
     
     return error,maxValue,maxInd
 
 
-def calcMaxErr():
-
-    err = np.zeros(15)
+def calcMaxErr(seq):
 
     jointMaxErr = np.zeros(15)
     jointErrCount = np.zeros(15)
     
     totalErr = np.zeros(15)
     for i in range(31):
-        error,maxV,maxInd = printErr(i)
+        if '171204_pose3' in seq and (i == 20 or i == 21):
+            continue
+        error, maxV, maxInd = printErr(i,seq)
         jointMaxErr[maxInd] += maxV
         jointErrCount[maxInd] += 1
-        totalErr = np.add(totalErr,error)
+        totalErr = np.add(totalErr, error)
 
-    totalErr = np.divide(totalErr,31)
-    err = np.divide(err,31)
+    if '171204_pose3' in seq:
+        totalErr = np.divide(totalErr, 29)
+    else:
+        totalErr = np.divide(totalErr, 31)
 
-    avgErr = np.nan_to_num(np.divide(jointMaxErr,jointErrCount))
+    avgErr = np.nan_to_num(np.divide(jointMaxErr, jointErrCount))
     
 
     maxErrJoint = np.where(jointMaxErr == np.amax(jointMaxErr))
@@ -87,6 +105,6 @@ def calcMaxErr():
 
 
 if __name__=='__main__':
-
-    calcTotal()
-    calcMaxErr()
+    seq = "171204_pose3"
+    calcTotal(seq)
+    calcMaxErr(seq)
